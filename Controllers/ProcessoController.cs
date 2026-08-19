@@ -1,6 +1,7 @@
-﻿using ApiGestaoProcessos.Models;
+﻿using ApiGestaoProcessos.Data;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace ApiGestaoProcessos.Controllers
 {
@@ -9,69 +10,91 @@ namespace ApiGestaoProcessos.Controllers
     public class ProcessoController : ControllerBase
     {
 
+        private readonly AppDbContext _context;
+
+        public ProcessoController(AppDbContext context)
+        {
+            _context = context;
+        }
+
         // GET: /processos - Lista todos os processos
         [HttpGet]
-        public IActionResult Get()
+        public async Task<IActionResult> Get()
         {
-            var listaProcessos = Processo.Lista;
+            try
+            {
+                var listaProcessos = await _context.Processos.ToListAsync();
 
-            return Ok(listaProcessos);
+                return Ok(listaProcessos);
+            }
+            catch (Exception ex)
+            {
+                return Problem(ex.Message);
+            }
         }
 
         // GET: /processos/{id} - Busca um processo por ID
         [HttpGet("{id}")]
-        public IActionResult GetById(Guid id)
+        public async Task<IActionResult> GetById(int id)
         {
-            var processo = Processo.Lista.FirstOrDefault(x => x.Id == id);
-
-            if (processo is null)
+            try
             {
-                return NotFound(new { Mensagem = $"Processo {id} não encontrado" });
+                var processo = await _context.Processos.FirstOrDefaultAsync(x => x.Id == id);
+
+                if (processo is null)
+                {
+                    return NotFound(new { Mensagem = $"Processo {id} não encontrado" });
+                }
+
+                return Ok(processo);
             }
-
-            return Ok(processo);
-        }
-
-        // POST: /processos - Cadastro de uum novo processo
-        [HttpPost]
-        public IActionResult Post([FromBody] Processo novoProcesso)
-        {
-            Processo.Lista.Add(novoProcesso);
-
-            return CreatedAtAction(nameof(GetById), new { id = novoProcesso.Id }, novoProcesso);
-        }
-
-        // PUT: /processos/{id} - Atualiza um processo existente
-        [HttpPut("{id}")]
-        public IActionResult Put(Guid id, [FromBody] Processo processoAtualizado)
-        {
-            var processoExistente = Processo.Lista.FirstOrDefault(x => x.Id == id);
-
-            if (processoExistente is null)
+            catch
             {
-                return NotFound(new { Mensagem = $"Processo informado não encontrado" });
+                return Problem("Ocorreram erros ao buscar o processo");
             }
-
-            processoExistente.Nome = processoAtualizado.Nome;
-            processoExistente.Status = processoAtualizado.Status;
-
-            return NoContent();
+            
         }
 
-        // DELETE: /processos/{id} - Remove um processo
-        [HttpDelete("{id}")]
-        public IActionResult Delete(Guid id)
-        {
-            var processoExistente = Processo.Lista.FirstOrDefault(x => x.Id == id);
+        //// POST: /processos - Cadastro de uum novo processo
+        //[HttpPost]
+        //public IActionResult Post([FromBody] Processo novoProcesso)
+        //{
+        //    Processo.Lista.Add(novoProcesso);
 
-            if (processoExistente is null)
-            {
-                return NotFound(new { Mensagem = $"Processo informado não encontrado" });
-            }
+        //    return CreatedAtAction(nameof(GetById), new { id = novoProcesso.Id }, novoProcesso);
+        //}
 
-            Processo.Lista.Remove(processoExistente);
+        //// PUT: /processos/{id} - Atualiza um processo existente
+        //[HttpPut("{id}")]
+        //public IActionResult Put(Guid id, [FromBody] Processo processoAtualizado)
+        //{
+        //    var processoExistente = Processo.Lista.FirstOrDefault(x => x.Id == id);
 
-            return NoContent();
-        }
+        //    if (processoExistente is null)
+        //    {
+        //        return NotFound(new { Mensagem = $"Processo informado não encontrado" });
+        //    }
+
+        //    processoExistente.Nome = processoAtualizado.Nome;
+        //    processoExistente.Status = processoAtualizado.Status;
+
+        //    return NoContent();
+        //}
+
+        //// DELETE: /processos/{id} - Remove um processo
+        //[HttpDelete("{id}")]
+        //public IActionResult Delete(Guid id)
+        //{
+        //    var processoExistente = Processo.Lista.FirstOrDefault(x => x.Id == id);
+
+        //    if (processoExistente is null)
+        //    {
+        //        return NotFound(new { Mensagem = $"Processo informado não encontrado" });
+        //    }
+
+        //    Processo.Lista.Remove(processoExistente);
+
+        //    return NoContent();
+        //}
     }
 }
