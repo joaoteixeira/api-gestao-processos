@@ -1,4 +1,6 @@
 ﻿using ApiGestaoProcessos.Data;
+using ApiGestaoProcessos.Dtos;
+using ApiGestaoProcessos.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -55,46 +57,105 @@ namespace ApiGestaoProcessos.Controllers
             
         }
 
-        //// POST: /processos - Cadastro de uum novo processo
-        //[HttpPost]
-        //public IActionResult Post([FromBody] Processo novoProcesso)
-        //{
-        //    Processo.Lista.Add(novoProcesso);
+        // POST: /processos - Cadastro de uum novo processo
+        [HttpPost]
+        public async Task<IActionResult> Post([FromBody] ProcessoDto novoProcesso)
+        {
+            try
+            {
+                var processo = new Processo()
+                {
+                    Numero = novoProcesso.Numero,
+                    Data = novoProcesso.Data,
+                    Interessado = novoProcesso.Interessado,
+                    Assunto = novoProcesso.Assunto,
+                    Descricao = novoProcesso.Descricao
+                };
 
-        //    return CreatedAtAction(nameof(GetById), new { id = novoProcesso.Id }, novoProcesso);
-        //}
+                await _context.Processos.AddAsync(processo);
+                await _context.SaveChangesAsync();
 
-        //// PUT: /processos/{id} - Atualiza um processo existente
-        //[HttpPut("{id}")]
-        //public IActionResult Put(Guid id, [FromBody] Processo processoAtualizado)
-        //{
-        //    var processoExistente = Processo.Lista.FirstOrDefault(x => x.Id == id);
+                return CreatedAtAction(nameof(GetById), new { id = processo.Id }, processo);
 
-        //    if (processoExistente is null)
-        //    {
-        //        return NotFound(new { Mensagem = $"Processo informado não encontrado" });
-        //    }
+            } catch
+            {
+                return Problem("Ocorreram erros ao salvar o processo");
+            }
+        }
 
-        //    processoExistente.Nome = processoAtualizado.Nome;
-        //    processoExistente.Status = processoAtualizado.Status;
 
-        //    return NoContent();
-        //}
+        // PUT: /processos/{id} - Atualiza um processo existente
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Put(int id, [FromBody] ProcessoUpdateDto processoAtualizado)
+        {
+            try
+            {
+                var processoExistente = await _context.Processos.FirstOrDefaultAsync(x => x.Id == id);
 
-        //// DELETE: /processos/{id} - Remove um processo
-        //[HttpDelete("{id}")]
-        //public IActionResult Delete(Guid id)
-        //{
-        //    var processoExistente = Processo.Lista.FirstOrDefault(x => x.Id == id);
+                if (processoExistente is null)
+                {
+                    return NotFound(new { Mensagem = $"Processo informado não encontrado" });
+                }
 
-        //    if (processoExistente is null)
-        //    {
-        //        return NotFound(new { Mensagem = $"Processo informado não encontrado" });
-        //    }
+                processoExistente.Numero = processoAtualizado.Numero;
+                processoExistente.Data = processoAtualizado.Data;
+                processoExistente.Interessado = processoAtualizado.Interessado;
+                processoExistente.Assunto = processoAtualizado.Assunto;
+                processoExistente.Descricao = processoAtualizado.Descricao;
 
-        //    Processo.Lista.Remove(processoExistente);
+                if (processoAtualizado.Situacao is not null)
+                {
+                    processoExistente.Situacao = processoAtualizado.Situacao;
+                }
 
-        //    return NoContent();
-        //}
+                await _context.SaveChangesAsync();
+
+                return NoContent();
+            } catch
+            {
+                return Problem("Ocorreram erros ao atualizar o processo");
+            }
+        }
+
+        // DELETE: /processos/{id} - Remove um processo
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var processoExistente = await _context.Processos.FirstOrDefaultAsync(x => x.Id == id);
+
+            if (processoExistente is null)
+            {
+                return NotFound(new { Mensagem = $"Processo informado não encontrado" });
+            }
+
+            _context.Processos.Remove(processoExistente);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+
+        [HttpPost("{id}/concluir")]
+        public async Task<IActionResult> Concluir(int id)
+        {
+            try
+            {
+                var processoExistente = await _context.Processos.FirstOrDefaultAsync(x => x.Id == id);
+
+                if (processoExistente is null)
+                {
+                    return NotFound(new { Mensagem = $"Processo informado não encontrado" });
+                }
+
+                processoExistente.Situacao = "Concluído";
+
+                await _context.SaveChangesAsync();
+
+                return Ok(processoExistente);
+            }
+            catch
+            {
+                return Problem("Ocorreram erros ao finalizar o processo");
+            }
+        }
     }
 }

@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using ApiGestaoProcessos.Enums;
+using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ApiGestaoProcessos.Entities
@@ -16,10 +17,10 @@ namespace ApiGestaoProcessos.Entities
         public DateOnly Data { get; set; }
 
         [Column("interessado_pro")]
-        public required string Interessado { get; set; }
+        public string Interessado { get; set; } = string.Empty;
 
         [Column("assunto_pro")]
-        public required string Assunto { get; set; }
+        public string Assunto { get; set; } = string.Empty;
 
         [Column("descricao_pro")]
         public string? Descricao { get; set; }
@@ -28,6 +29,6 @@ namespace ApiGestaoProcessos.Entities
         public string Situacao { get; set; } = "Aberto";
 
         [Column("created_at")]
-        public DateTime CreatedAt { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
     }
 }
