@@ -4,6 +4,7 @@ using ApiGestaoProcessos.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Swashbuckle.AspNetCore.Filters;
 
 namespace ApiGestaoProcessos.Controllers
 {
@@ -103,10 +104,10 @@ namespace ApiGestaoProcessos.Controllers
                 processoExistente.Assunto = processoAtualizado.Assunto;
                 processoExistente.Descricao = processoAtualizado.Descricao;
 
-                if (processoAtualizado.Situacao is not null)
-                {
-                    processoExistente.Situacao = processoAtualizado.Situacao;
-                }
+                //if (processoAtualizado.Situacao is not null)
+                //{
+                //    processoExistente.Situacao = processoAtualizado.Situacao;
+                //}
 
                 await _context.SaveChangesAsync();
 
@@ -146,7 +147,7 @@ namespace ApiGestaoProcessos.Controllers
                     return NotFound(new { Mensagem = $"Processo informado não encontrado" });
                 }
 
-                processoExistente.Situacao = "Concluído";
+                //processoExistente.Situacao = "Concluído";
 
                 await _context.SaveChangesAsync();
 

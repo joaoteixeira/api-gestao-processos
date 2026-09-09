@@ -1,4 +1,5 @@
 ﻿using ApiGestaoProcessos.Entities;
+using ApiGestaoProcessos.Enums;
 using Microsoft.EntityFrameworkCore;
 
 namespace ApiGestaoProcessos.Data
@@ -12,6 +13,15 @@ namespace ApiGestaoProcessos.Data
         }
 
         public DbSet<Processo> Processos { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Processo>()
+                .Property(e => e.Situacao)
+                .HasConversion(
+                    v => v.ToString(),
+                    v => Enum.Parse<SituacaoEnum>(v));
+        }
 
     }
 }

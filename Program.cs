@@ -1,7 +1,13 @@
+using ApiGestaoProcessos.Common.Configurations;
 using ApiGestaoProcessos.Data;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Swashbuckle.AspNetCore.Filters;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.Configure<ApiBehaviorOptions>(ApiBehaviorConfiguration.Configure);
 
 // Configuração do Entity Framework Core com MySql
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
@@ -11,11 +17,17 @@ builder.Services.AddDbContext<AppDbContext>(options => options.UseMySql(connecti
 
 // Add services to the container.
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    });
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
 // Swagger Config
+//builder.Services.AddSwaggerExamplesFromAssemblyOf<Program>();
+
 builder.Services.AddSwaggerGen(options =>
 {
     options.SwaggerDoc("v1", new Microsoft.OpenApi.OpenApiInfo
@@ -24,6 +36,9 @@ builder.Services.AddSwaggerGen(options =>
         Version = "v1",
         Description = "Api desenvolvida em ASP.NET Core para Gestão de Processos"
     });
+
+    options.EnableAnnotations();
+    //options.ExampleFilters();
 });
 
 var app = builder.Build();

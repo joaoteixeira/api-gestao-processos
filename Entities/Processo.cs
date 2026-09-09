@@ -26,7 +26,7 @@ namespace ApiGestaoProcessos.Entities
         public string? Descricao { get; set; }
 
         [Column("situacao_pro")]
-        public string Situacao { get; set; } = "Aberto";
+        public SituacaoEnum Situacao { get; set; } = SituacaoEnum.Aberto;
 
         [Column("created_at")]
         public DateTime CreatedAt { get; set; } = DateTime.Now;
