@@ -13,5 +13,7 @@ namespace ApiGestaoProcessos.Data
 
         public DbSet<Processo> Processos { get; set; }
 
+        public DbSet<Cliente> Clientes { get; set; }
+
     }
 }
