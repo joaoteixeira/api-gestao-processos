@@ -1,6 +1,8 @@
 ﻿using ApiGestaoProcessos.Data;
 using ApiGestaoProcessos.Dtos;
 using ApiGestaoProcessos.Entities;
+using ApiGestaoProcessos.Services;
+using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -14,9 +16,12 @@ namespace ApiGestaoProcessos.Controllers
 
         private readonly AppDbContext _context;
 
-        public ProcessoController(AppDbContext context)
+        private readonly ProcessoService _service;
+
+        public ProcessoController(AppDbContext context, ProcessoService service)
         {
             _context = context;
+            _service = service;
         }
 
         // GET: /processos - Lista todos os processos
@@ -25,9 +30,9 @@ namespace ApiGestaoProcessos.Controllers
         {
             try
             {
-                var listaProcessos = await _context.Processos.ToListAsync();
+                var processos = await _service.FindAll();
 
-                return Ok(listaProcessos);
+                return Ok(processos);
             }
             catch (Exception ex)
             {
@@ -41,7 +46,7 @@ namespace ApiGestaoProcessos.Controllers
         {
             try
             {
-                var processo = await _context.Processos.FirstOrDefaultAsync(x => x.Id == id);
+                var processo = await _service.FindById(id);
 
                 if (processo is null)
                 {
@@ -63,17 +68,7 @@ namespace ApiGestaoProcessos.Controllers
         {
             try
             {
-                var processo = new Processo()
-                {
-                    Numero = novoProcesso.Numero,
-                    Data = novoProcesso.Data,
-                    Interessado = novoProcesso.Interessado,
-                    Assunto = novoProcesso.Assunto,
-                    Descricao = novoProcesso.Descricao
-                };
-
-                await _context.Processos.AddAsync(processo);
-                await _context.SaveChangesAsync();
+                var processo = await _service.Create(novoProcesso);
 
                 return CreatedAtAction(nameof(GetById), new { id = processo.Id }, processo);
 
@@ -90,25 +85,7 @@ namespace ApiGestaoProcessos.Controllers
         {
             try
             {
-                var processoExistente = await _context.Processos.FirstOrDefaultAsync(x => x.Id == id);
-
-                if (processoExistente is null)
-                {
-                    return NotFound(new { Mensagem = $"Processo informado não encontrado" });
-                }
-
-                processoExistente.Numero = processoAtualizado.Numero;
-                processoExistente.Data = processoAtualizado.Data;
-                processoExistente.Interessado = processoAtualizado.Interessado;
-                processoExistente.Assunto = processoAtualizado.Assunto;
-                processoExistente.Descricao = processoAtualizado.Descricao;
-
-                if (processoAtualizado.Situacao is not null)
-                {
-                    processoExistente.Situacao = processoAtualizado.Situacao;
-                }
-
-                await _context.SaveChangesAsync();
+                await _service.Update(id, processoAtualizado);
 
                 return NoContent();
             } catch
