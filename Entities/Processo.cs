@@ -30,5 +30,11 @@ namespace ApiGestaoProcessos.Entities
 
         [Column("created_at")]
         public DateTime CreatedAt { get; set; } = DateTime.Now;
+
+
+        [Column("id_cli_pro")]
+        public int? ClienteId { get; set; }
+
+        public virtual Cliente? Cliente { get; set; }
     }
 }

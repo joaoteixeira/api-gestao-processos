@@ -1,7 +1,9 @@
 ﻿using ApiGestaoProcessos.Data;
 using ApiGestaoProcessos.Dtos;
+using ApiGestaoProcessos.Dtos.Responses;
 using ApiGestaoProcessos.Entities;
 using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
 
 namespace ApiGestaoProcessos.Services
@@ -22,6 +24,16 @@ namespace ApiGestaoProcessos.Services
             await _context.SaveChangesAsync();
 
             return cliente;
+        }
+
+        public async Task<ICollection<Processo>?> GetAllProcessosByClienteId(int id)
+        {
+
+            var cliente = await _context.Clientes.Include(c => c.Processos).FirstOrDefaultAsync(x => x.Id == id);
+
+            if (cliente is null) return [];
+
+            return cliente.Processos;
         }
 
     }

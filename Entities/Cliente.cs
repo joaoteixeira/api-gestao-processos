@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace ApiGestaoProcessos.Entities
 {
@@ -11,5 +12,8 @@ namespace ApiGestaoProcessos.Entities
 
         [Column("nome")]
         public string Nome { get; set; } = string.Empty;
+
+        //[JsonIgnore]
+        public ICollection<Processo>? Processos { get; set; }
     }
 }

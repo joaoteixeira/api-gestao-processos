@@ -1,4 +1,5 @@
 ﻿using ApiGestaoProcessos.Dtos;
+using ApiGestaoProcessos.Dtos.Responses;
 using ApiGestaoProcessos.Entities;
 using AutoMapper;
 
@@ -17,6 +18,10 @@ namespace ApiGestaoProcessos.Profiles
             CreateMap<ProcessoUpdateDto, Processo>();
 
             CreateMap<ClienteDto, Cliente>();
+
+            CreateMap<Cliente, ClienteResponseDto>();
+
+            CreateMap<Processo, ProcessoResponseDto>();
         }
     }
 }

@@ -1,7 +1,9 @@
 ﻿using ApiGestaoProcessos.Data;
 using ApiGestaoProcessos.Dtos;
+using ApiGestaoProcessos.Dtos.Responses;
 using ApiGestaoProcessos.Entities;
 using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
 
 namespace ApiGestaoProcessos.Services
@@ -13,14 +15,18 @@ namespace ApiGestaoProcessos.Services
         private readonly IMapper _mapper = mapper;
 
 
-        public async Task<ICollection<Processo>> FindAll()
+        public async Task<ICollection<ProcessoResponseDto>> FindAll()
         {
-            return await _context.Processos.ToListAsync();
+            return await _context.Processos
+                .ProjectTo<ProcessoResponseDto>(_mapper.ConfigurationProvider)
+                .ToListAsync();
         }
 
-        public async Task<Processo?> FindById(int id)
+        public async Task<ProcessoResponseDto?> FindById(int id)
         {
-            return await _context.Processos.FirstOrDefaultAsync(x => x.Id == id);
+            return await _context.Processos
+                .ProjectTo<ProcessoResponseDto>(_mapper.ConfigurationProvider)
+                .FirstOrDefaultAsync(x => x.Id == id);
         }
 
         public async Task<Processo> Create(ProcessoDto data)
@@ -35,7 +41,13 @@ namespace ApiGestaoProcessos.Services
 
         public async Task<Processo> Update(int id, ProcessoUpdateDto data)
         {
-            var processo = await FindById(id) ?? throw new Exception("Processo não encontrado");
+
+            var processo = await _context.Processos.FirstOrDefaultAsync(x => x.Id == id);
+
+            if (processo is null)
+            {
+                throw new Exception("Processo não encontrado");
+            }
 
              _mapper.Map(data, processo);
 
