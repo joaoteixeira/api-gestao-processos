@@ -36,5 +36,8 @@ namespace ApiGestaoProcessos.Entities
         public int? ClienteId { get; set; }
 
         public virtual Cliente? Cliente { get; set; }
+
+        // Lado "muitos" do relacionamento N:N com Marcacao
+        public ICollection<Marcacao>? Marcacoes { get; set; } = new List<Marcacao>();
     }
 }

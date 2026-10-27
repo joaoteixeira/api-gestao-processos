@@ -134,5 +134,15 @@ namespace ApiGestaoProcessos.Controllers
                 return Problem("Ocorreram erros ao finalizar o processo");
             }
         }
+
+        [HttpPost("{id}/marcacoes/{marcacaoId}")]
+        public async Task<IActionResult> AddMarcacao(int id, int marcacaoId)
+        {
+            var associated = await _service.AssociarMarcacao(id, marcacaoId);
+
+            return associated
+                ? NoContent()
+                : NotFound(new { Mensagem = "Processo ou marcação não encontrado" });
+        }
     }
 }

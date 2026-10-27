@@ -22,5 +22,7 @@ namespace ApiGestaoProcessos.Dtos.Responses
         public DateTime CreatedAt { get; set; } = DateTime.Now;
 
         public ClienteResponseDto? Cliente { get; set; }
+
+        public ICollection<MarcacaoResponseDto> Marcacoes { get; set; } = [];
     }
 }

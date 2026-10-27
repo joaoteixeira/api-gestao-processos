@@ -22,6 +22,10 @@ namespace ApiGestaoProcessos.Profiles
             CreateMap<Cliente, ClienteResponseDto>();
 
             CreateMap<Processo, ProcessoResponseDto>();
+
+            CreateMap<MarcacaoDto, Marcacao>();
+
+            CreateMap<Marcacao, MarcacaoResponseDto>();
         }
     }
 }

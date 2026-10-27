@@ -56,5 +56,29 @@ namespace ApiGestaoProcessos.Services
 
             return processo;
         }
+
+        public async Task<bool> AssociarMarcacao(int processoId, int marcacaoId)
+        {
+            var processo = await _context.Processos
+                .Include(p => p.Marcacoes)
+                .FirstOrDefaultAsync(p => p.Id == processoId);
+            var marcacao = await _context.Marcacoes
+                .FirstOrDefaultAsync(m => m.Id == marcacaoId);
+
+            if (processo is null || marcacao is null)
+            {
+                return false;
+            }
+
+            processo.Marcacoes ??= new List<Marcacao>();
+
+            if (!processo.Marcacoes.Any(m => m.Id == marcacaoId))
+            {
+                processo.Marcacoes.Add(marcacao);
+                await _context.SaveChangesAsync();
+            }
+
+            return true;
+        }
     }
 }

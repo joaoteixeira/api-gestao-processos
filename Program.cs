@@ -18,6 +18,7 @@ builder.Services.AddAutoMapper(config => config.AddProfile<AppProfile>());
 // Registro de Services
 builder.Services.AddScoped<ProcessoService>();
 builder.Services.AddScoped<ClienteService>();
+builder.Services.AddScoped<MarcacaoService>();
 
 // Add services to the container.
 
