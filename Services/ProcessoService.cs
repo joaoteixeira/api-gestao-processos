@@ -80,5 +80,38 @@ namespace ApiGestaoProcessos.Services
 
             return true;
         }
+
+        public async Task<(bool ProcessoExiste, bool EtapaExiste, bool JaAssociada, ProcessoEtapaResponseDto? Resultado)> 
+            AddEtapa(int processoId, ProcessoEtapaDto data)
+            {
+
+                var processoExiste = await _context.Processos.AnyAsync(x => x.Id == processoId);
+                var etapaExiste = await _context.Etapas.AnyAsync(x => x.Id == data.EtapaId);
+
+                if (!processoExiste || !etapaExiste)
+                {
+                    return (processoExiste, etapaExiste, false, null);
+                }
+
+                var jaAssociada = await _context.ProcessosEtapas.AnyAsync(x => x.ProcessoId == processoId && x.EtapaId == data.EtapaId);
+
+                if (jaAssociada) 
+                {
+                    return (true, true, true, null);
+                }
+
+                var processoEtapa = _mapper.Map<ProcessoEtapa>(data);
+                processoEtapa.ProcessoId = processoId;
+
+                _context.ProcessosEtapas.Add(processoEtapa);
+                await _context.SaveChangesAsync();
+
+                var resultado = await _context.ProcessosEtapas
+                                        .Where(x => x.ProcessoId == processoId && x.EtapaId == data.EtapaId)
+                                        .ProjectTo<ProcessoEtapaResponseDto>(_mapper.ConfigurationProvider)
+                                        .FirstAsync();
+
+                return (true, true, false, resultado);
+            }
     }
 }

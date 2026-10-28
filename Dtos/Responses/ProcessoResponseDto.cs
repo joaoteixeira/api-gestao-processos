@@ -24,5 +24,7 @@ namespace ApiGestaoProcessos.Dtos.Responses
         public ClienteResponseDto? Cliente { get; set; }
 
         public ICollection<MarcacaoResponseDto> Marcacoes { get; set; } = [];
+
+        public ICollection<ProcessoEtapaResponseDto> Etapas { get; set; } = [];
     }
 }

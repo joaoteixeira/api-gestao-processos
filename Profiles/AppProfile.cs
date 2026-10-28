@@ -21,11 +21,37 @@ namespace ApiGestaoProcessos.Profiles
 
             CreateMap<Cliente, ClienteResponseDto>();
 
-            CreateMap<Processo, ProcessoResponseDto>();
-
             CreateMap<MarcacaoDto, Marcacao>();
 
             CreateMap<Marcacao, MarcacaoResponseDto>();
+
+            CreateMap<Processo, ProcessoResponseDto>()
+                .ForMember(
+                    dest => dest.Etapas,
+                    opt => opt.MapFrom(src => src.ProcessosEtapas.OrderBy(x => x.Ordem))
+                );
+
+            CreateMap<Etapa, EtapaResponseDto>();
+
+            CreateMap<ProcessoEtapa, ProcessoEtapaResponseDto>()
+                .ForMember(
+                    dest => dest.Nome,
+                    opt => opt.MapFrom(src => src.Etapa.Nome)
+                );
+
+            CreateMap<ProcessoEtapaDto, ProcessoEtapa>()
+                .ForMember(
+                    dest => dest.ProcessoId,
+                    opt => opt.Ignore()
+                )
+                .ForMember(
+                    dest => dest.Processo,
+                    opt => opt.Ignore()
+                )
+                .ForMember(
+                    dest => dest.Etapa,
+                    opt => opt.Ignore()
+                );
         }
     }
 }

@@ -39,5 +39,8 @@ namespace ApiGestaoProcessos.Entities
 
         // Lado "muitos" do relacionamento N:N com Marcacao
         public ICollection<Marcacao>? Marcacoes { get; set; } = new List<Marcacao>();
+
+        public ICollection<ProcessoEtapa> ProcessosEtapas { get; set; } 
+            = new List<ProcessoEtapa>();
     }
 }

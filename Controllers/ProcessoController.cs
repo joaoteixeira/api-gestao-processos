@@ -144,5 +144,23 @@ namespace ApiGestaoProcessos.Controllers
                 ? NoContent()
                 : NotFound(new { Mensagem = "Processo ou marcação não encontrado" });
         }
+
+        [HttpPost("{id}/etapas")]
+        public async Task<IActionResult> AddEtapa(int id, [FromBody] ProcessoEtapaDto data)
+        {
+            var result = await _service.AddEtapa(id, data);
+
+            if (!result.ProcessoExiste || !result.EtapaExiste)
+            {
+                return NotFound(new { Mensagem = "Processo e/ou etapa não encontrado" });
+            }
+
+            if (result.JaAssociada)
+            {
+                return Conflict(new { Mensagem = "A etapa já está associada ao processo" });
+            }
+
+            return CreatedAtAction(nameof(GetById), new { id }, result.Resultado);
+        }
     }
 }
